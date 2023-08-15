@@ -54,11 +54,13 @@ def write_video_cluster_metrics(metrics, add_summary_fn):
   add_summary_fn('CTR', metrics['click'] / metrics['impression'])
   if metrics['click'] > 0:
     add_summary_fn('AverageQuality', metrics['quality'] / metrics['click'])
+  prefix = 'cluster_watch_count_cluster_'
   for k in metrics:
-    prefix = 'cluster_watch_count_cluster_'
     if k.startswith(prefix):
-      add_summary_fn('cluster_watch_count_frac/cluster_%s' % k[len(prefix):],
-                     metrics[k] / metrics['impression'])
+      add_summary_fn(
+          f'cluster_watch_count_frac/cluster_{k[len(prefix):]}',
+          metrics[k] / metrics['impression'],
+      )
   add_summary_fn(
       'cluster_watch_count_frac/no_click',
       metrics['cluster_watch_count_no_click'] / metrics['impression'])

@@ -134,9 +134,9 @@ class Environment(object):
       done: A boolean indicating whether the episode has terminated
     """
 
-    assert (len(slate) == self._slate_size
-           ), 'Received unexpected slate size: expecting %s, got %s' % (
-               self._slate_size, len(slate))
+    assert (
+        len(slate) == self._slate_size
+    ), f'Received unexpected slate size: expecting {self._slate_size}, got {len(slate)}'
 
     # Get the documents associated with the slate
     doc_ids = list(self._current_documents)

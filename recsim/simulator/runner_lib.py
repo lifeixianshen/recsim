@@ -249,10 +249,7 @@ class Runner(object):
       total_reward += reward
       step_number += 1
 
-      if done:
-        break
-      elif step_number == self._max_steps_per_episode:
-        # Stop the run loop once we reach the true end of episode.
+      if done or step_number == self._max_steps_per_episode:
         break
       else:
         action = self._agent.step(reward, observation)
@@ -292,8 +289,7 @@ class Runner(object):
 
     def add_summary(tag, value):
       summary = tf.compat.v1.Summary(value=[
-          tf.compat.v1.Summary.Value(
-              tag=tag + '/' + suffix, simple_value=value)
+          tf.compat.v1.Summary.Value(tag=f'{tag}/{suffix}', simple_value=value)
       ])
       self._summary_writer.add_summary(summary, step)
 
@@ -317,9 +313,8 @@ class Runner(object):
       iteration: int, iteration number for checkpointing.
       total_steps: int, total number of steps for all iterations so far.
     """
-    experiment_data = self._agent.bundle_and_checkpoint(self._checkpoint_dir,
-                                                        iteration)
-    if experiment_data:
+    if experiment_data := self._agent.bundle_and_checkpoint(
+        self._checkpoint_dir, iteration):
       experiment_data['current_iteration'] = iteration
       experiment_data['total_steps'] = total_steps
       self._checkpointer.save_checkpoint(iteration, experiment_data)
@@ -400,8 +395,7 @@ class EvalRunner(Runner):
     self._test_mode = test_mode
     self._min_interval_secs = min_interval_secs
 
-    self._output_dir = os.path.join(self._base_dir,
-                                    'eval_%s' % max_eval_episodes)
+    self._output_dir = os.path.join(self._base_dir, f'eval_{max_eval_episodes}')
     tf.io.gfile.makedirs(self._output_dir)
     if train_base_dir is None:
       train_base_dir = self._base_dir
@@ -453,7 +447,7 @@ class EvalRunner(Runner):
 
     self._write_metrics(total_steps, suffix='eval')
 
-    output_file = os.path.join(self._output_dir, 'returns_%s' % total_steps)
+    output_file = os.path.join(self._output_dir, f'returns_{total_steps}')
     tf.compat.v1.logging.info('eval_file: %s', output_file)
     with tf.io.gfile.GFile(output_file, 'w+') as f:
       f.write(str(episode_rewards))

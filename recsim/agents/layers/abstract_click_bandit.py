@@ -127,11 +127,7 @@ class AbstractClickBanditLayer(agent.AbstractHierarchicalAgentLayer):
     mab_alg.set_state(pulls, clicks)
     arm_pctr_ucb = mab_alg.get_score(np.sum(pulls))
     # Use (topic_pctr_ucb, document_quality) as the criterion.
-    if all(pulls):
-      scores = arm_pctr_ucb
-    else:
-      # Pick the topics that have not beeen pulled.
-      scores = -pulls
+    scores = arm_pctr_ucb if all(pulls) else -pulls
     arm_order = list(np.argsort(scores))
     docs_so_far = 0
     actions = []

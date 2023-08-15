@@ -53,10 +53,9 @@ class FullSlateQAgent(dqn_agent.DQNAgentRecSim,
     self._num_candidates = int(action_space.nvec[0])
     abstract_agent.AbstractEpisodicRecommenderAgent.__init__(self, action_space)
     # Each slate is a single action. Assume ordering of items matters.
-    self._all_possible_slates = [
-        x for x in itertools.permutations(
-            range(self._num_candidates), action_space.nvec.shape[0])
-    ]
+    self._all_possible_slates = list(
+        itertools.permutations(range(self._num_candidates),
+                               action_space.nvec.shape[0]))
     num_actions = len(self._all_possible_slates)
     self._env_action_space = spaces.Discrete(num_actions)
 
@@ -78,9 +77,7 @@ class FullSlateQAgent(dqn_agent.DQNAgentRecSim,
       q_value_list = []
       for slate in self._all_possible_slates:
         user = tf.squeeze(states[:, 0, :, :], axis=2)
-        docs = []
-        for i in slate:
-          docs.append(tf.squeeze(states[:, i + 1, :, :], axis=2))
+        docs = [tf.squeeze(states[:, i + 1, :, :], axis=2) for i in slate]
         q_value_list.append(self.network(user, tf.concat(docs, axis=1), scope))
       q_values = tf.concat(q_value_list, axis=1)
 

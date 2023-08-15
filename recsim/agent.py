@@ -150,9 +150,7 @@ class AbstractEpisodicRecommenderAgent(AbstractRecommenderAgent):
     """
     del checkpoint_dir  # Unused.
     del iteration_number  # Unused.
-    bundle_dict = {}
-    bundle_dict['episode_num'] = self._episode_num
-    return bundle_dict
+    return {'episode_num': self._episode_num}
 
   def unbundle(self, checkpoint_dir, iteration_number, bundle_dict):
     """Restores the agent from a checkpoint.
@@ -245,7 +243,7 @@ class AbstractHierarchicalAgentLayer(AbstractRecommenderAgent):
     for i, base_agent in enumerate(self._base_agents):
       base_bundle_dict = base_agent.bundle_and_checkpoint(
           checkpoint_dir, iteration_number)
-      bundle_dict['base_agent_bundle_{}'.format(i)] = base_bundle_dict
+      bundle_dict[f'base_agent_bundle_{i}'] = base_bundle_dict
     return bundle_dict
 
   def unbundle(self, checkpoint_dir, iteration_number, bundle_dict):
@@ -264,10 +262,9 @@ class AbstractHierarchicalAgentLayer(AbstractRecommenderAgent):
     """
     success = True
     for i, base_agent in enumerate(self._base_agents):
-      if 'base_agent_bundle_{}'.format(i) not in bundle_dict:
+      if f'base_agent_bundle_{i}' not in bundle_dict:
         logging.warning('Base agent bundle not found in bundle.')
         return False
-      success &= base_agent.unbundle(
-          checkpoint_dir, iteration_number,
-          bundle_dict['base_agent_bundle_{}'.format(i)])
+      success &= base_agent.unbundle(checkpoint_dir, iteration_number,
+                                     bundle_dict[f'base_agent_bundle_{i}'])
     return success

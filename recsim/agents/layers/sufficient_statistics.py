@@ -91,7 +91,7 @@ class SufficientStatisticsLayer(agent.AbstractHierarchicalAgentLayer):
 
   def _preprocess_reward_observation(self, reward, observation):
     self._update(observation)
-    augmented_observation = {key: value for key, value in observation.items()}
+    augmented_observation = dict(observation.items())
     augmented_observation['user'] = {
         'raw_observation': augmented_observation['user'],
         'sufficient_statistics': self._create_observation()

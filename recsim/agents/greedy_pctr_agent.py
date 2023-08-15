@@ -98,6 +98,4 @@ class GreedyPCTRAgent(agent.AbstractEpisodicRecommenderAgent):
     scores = np.array(scores)
     indices = np.argpartition(scores, -self._slate_size)[-self._slate_size:]
 
-    # Sort them so the best appear first
-    sorted_indices = indices[np.argsort(-scores[indices])]
-    return sorted_indices
+    return indices[np.argsort(-scores[indices])]

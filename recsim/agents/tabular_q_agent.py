@@ -148,15 +148,15 @@ class TabularQAgent(agent.AbstractEpisodicRecommenderAgent):
       elif isinstance(gym_space, spaces.discrete.Discrete):
         index.append(gym_observation)
       else:
-        raise NotImplementedError('Gym space type ' + str(type(gym_space)) +
-                                  ' not implemented yet.')
+        raise NotImplementedError(
+            f'Gym space type {str(type(gym_space))} not implemented yet.')
     return index
 
   def _enumerate_slates(self, doc_dict):
     documents = list(doc_dict.values())
     num_documents = len(documents)
     for slate in itertools.combinations(range(num_documents), self._slate_size):
-      yield slate, tuple([documents[i] for i in slate])
+      yield (slate, tuple(documents[i] for i in slate))
 
   def _enumerate_state_action_indices(self, observation):
     for (slate, slate_features) in self._enumerate_slates(observation['doc']):
@@ -249,9 +249,10 @@ class TabularQAgent(agent.AbstractEpisodicRecommenderAgent):
     """
     del checkpoint_dir  # Unused.
     del iteration_number  # Unused.
-    bundle_dict = {'q_value_table': self._q_value_table}
-    bundle_dict['sa_count'] = self._state_action_counts
-    return bundle_dict
+    return {
+        'q_value_table': self._q_value_table,
+        'sa_count': self._state_action_counts,
+    }
 
   def unbundle(self, checkpoint_dir, iteration_number, bundle_dict):
     """Restores the agent from a checkpoint.

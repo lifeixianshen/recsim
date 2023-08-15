@@ -460,7 +460,7 @@ class SlateDecompQAgent(dqn_agent.DQNAgentRecSim,
         observation_space.spaces['response'])
     response_names = self._response_adapter.response_names
     expected_response_names = ['click', 'watch_time']
-    if not all(key in response_names for key in expected_response_names):
+    if any(key not in response_names for key in expected_response_names):
       raise ValueError(
           "Couldn't find all fields needed for the decomposition: %r" %
           expected_response_names)
@@ -628,10 +628,10 @@ class SlateDecompQAgent(dqn_agent.DQNAgentRecSim,
         initializer=tf.compat.v1.zeros_initializer())
     output_slate = tf.reshape(self._output_slate, [-1])
     output_one_hot = tf.one_hot(output_slate, self._num_candidates)
-    update_ops = []
-    for i in range(self._slate_size):
-      update_ops.append(
-          tf.compat.v1.assign_add(self._action_counts, output_one_hot[i]))
+    update_ops = [
+        tf.compat.v1.assign_add(self._action_counts, output_one_hot[i])
+        for i in range(self._slate_size)
+    ]
     self._select_action_update_op = tf.group(*update_ops)
 
   def _select_action(self):
@@ -656,21 +656,20 @@ class SlateDecompQAgent(dqn_agent.DQNAgentRecSim,
       # Sample without replacement.
       return np.random.choice(
           self._num_candidates, self._slate_size, replace=False)
-    else:
-      observation = self._raw_observation
-      user_obs = observation['user']
-      doc_obs = np.array(list(observation['doc'].values()))
-      tf.compat.v1.logging.debug('cp 1: %s, %s', doc_obs, observation)
-      # TODO(cwhsu): Use score_documents_tf() and remove score_documents().
-      scores, score_no_click = score_documents(user_obs, doc_obs)
-      output_slate, _ = self._sess.run(
-          [self._output_slate, self._select_action_update_op], {
-              self.state_ph: self.state,
-              self._doc_affinity_scores_ph: scores,
-              self._prob_no_click_ph: score_no_click,
-          })
+    observation = self._raw_observation
+    user_obs = observation['user']
+    doc_obs = np.array(list(observation['doc'].values()))
+    tf.compat.v1.logging.debug('cp 1: %s, %s', doc_obs, observation)
+    # TODO(cwhsu): Use score_documents_tf() and remove score_documents().
+    scores, score_no_click = score_documents(user_obs, doc_obs)
+    output_slate, _ = self._sess.run(
+        [self._output_slate, self._select_action_update_op], {
+            self.state_ph: self.state,
+            self._doc_affinity_scores_ph: scores,
+            self._prob_no_click_ph: score_no_click,
+        })
 
-      return output_slate
+    return output_slate
 
   # Other functions.
   def _build_replay_buffer(self, use_staging):
@@ -797,4 +796,4 @@ def create_agent(agent_name, sess, **kwargs):
         compute_target_fn=compute_target_greedy_q,
         **kwargs)
   else:
-    raise ValueError('Unknown agent: {}'.format(agent_name))
+    raise ValueError(f'Unknown agent: {agent_name}')

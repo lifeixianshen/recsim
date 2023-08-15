@@ -152,8 +152,7 @@ class RecSimGymEnv(gym.Env):
     np.random.seed(seed=seed)
 
   def extract_env_info(self):
-    info = {'env': self._environment}
-    return info
+    return {'env': self._environment}
 
   def reset_metrics(self):
     """Resets every metric to zero.

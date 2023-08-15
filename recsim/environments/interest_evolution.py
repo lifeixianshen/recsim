@@ -189,14 +189,16 @@ class IEvVideoSampler(document.AbstractDocumentSampler):
     self._video_length_std = video_length_std
 
   def sample_document(self):
-    doc_features = {}
-    doc_features['doc_id'] = self._doc_count
-    # For now, assume the document properties are uniform random.
-    # It will probably make more sense to concentrate the interests around a few
-    # (e.g. 5?) categories or have a more sophisticated generative process?
-    doc_features['features'] = self._rng.uniform(
-        self._min_feature_value, self._max_feature_value,
-        self.get_doc_ctor().NUM_FEATURES)
+    doc_features = {
+        'doc_id':
+        self._doc_count,
+        'features':
+        self._rng.uniform(
+            self._min_feature_value,
+            self._max_feature_value,
+            self.get_doc_ctor().NUM_FEATURES,
+        ),
+    }
     doc_features['video_length'] = min(
         self._rng.normal(self._video_length_mean, self._video_length_std),
         self.get_doc_ctor().MAX_VIDEO_LENGTH)
@@ -241,9 +243,7 @@ class UtilityModelVideoSampler(document.AbstractDocumentSampler):
     self.cluster_means = np.concatenate((trashy, nutritious))
 
   def sample_document(self):
-    doc_features = {}
-    doc_features['doc_id'] = self._doc_count
-
+    doc_features = {'doc_id': self._doc_count}
     # Sample a cluster_id. Assumes there are NUM_FEATURE clusters.
     cluster_id = self._rng.randint(0, self._num_clusters)
     doc_features['cluster_id'] = cluster_id
@@ -382,14 +382,19 @@ class IEvUserDistributionSampler(user.AbstractUserSampler):
   def sample_user(self):
     """Samples a new user, with a new set of features."""
 
-    features = {}
-    features['user_interests'] = self._rng.uniform(
-        -1.0, 1.0,
-        self.get_user_ctor().NUM_FEATURES)
-    features['time_budget'] = 30
-    features['score_scaling'] = 0.05
-    features['attention_prob'] = 0.9
-    features['no_click_mass'] = 1
+    features = {
+        'user_interests':
+        self._rng.uniform(-1.0, 1.0,
+                          self.get_user_ctor().NUM_FEATURES),
+        'time_budget':
+        30,
+        'score_scaling':
+        0.05,
+        'attention_prob':
+        0.9,
+        'no_click_mass':
+        1,
+    }
     features['keep_interact_prob'] = self._rng.beta(1, 3, 1)
     features['min_doc_utility'] = 0.1
     features['user_update_alpha'] = 0
@@ -421,13 +426,13 @@ class UtilityModelUserSampler(user.AbstractUserSampler):
     super(UtilityModelUserSampler, self).__init__(user_ctor, **kwargs)
 
   def sample_user(self):
-    features = {}
-    # Interests are distributed uniformly randomly
-    features['user_interests'] = self._rng.uniform(
-        -1.0, 1.0,
-        self.get_user_ctor().NUM_FEATURES)
-    # Assume all users have fixed amount of time
-    features['time_budget'] = 200.0  # 120.0
+    features = {
+        'user_interests':
+        self._rng.uniform(-1.0, 1.0,
+                          self.get_user_ctor().NUM_FEATURES),
+        'time_budget':
+        200.0,
+    }
     features['no_click_mass'] = self._no_click_mass
     features['step_penalty'] = 0.5
     features['score_scaling'] = 0.05

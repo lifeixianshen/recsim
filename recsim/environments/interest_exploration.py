@@ -352,8 +352,7 @@ class IETopicDocumentSampler(document.AbstractDocumentSampler):
 
   def sample_document(self):
     """Samples the topic and then samples document features given the topic."""
-    doc_features = {}
-    doc_features['doc_id'] = self._doc_count
+    doc_features = {'doc_id': self._doc_count}
     self._doc_count += 1
     topic_id = self._rng.choice(self._number_of_topics, p=self._topic_dist)
     doc_quality = (

@@ -154,8 +154,8 @@ class DQNAgentRecSim(dqn_agent.DQNAgent):
                optimizer_name, eval_mode, **kwargs):
     if stack_size != 1:
       raise ValueError(
-          'Invalid stack_size: %s. Only stack_size=1 is supported for now.' %
-          stack_size)
+          f'Invalid stack_size: {stack_size}. Only stack_size=1 is supported for now.'
+      )
 
     self._env_observation_space = observation_space
     # In our case, the observation is a data structure that stores observation

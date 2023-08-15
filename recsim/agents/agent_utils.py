@@ -65,12 +65,11 @@ class GymSpaceWalker(object):
       for i, space in enumerate(gym_space.spaces):
         flattened_apply += self._descend_and_flatten(
             space, [gym_observation[i] for gym_observation in gym_observations])
-    elif isinstance(gym_space, spaces.box.Box) or isinstance(
-        gym_space, spaces.discrete.Discrete):
+    elif isinstance(gym_space, (spaces.box.Box, spaces.discrete.Discrete)):
       return self._leaf_op(gym_space, gym_observations)
     else:
-      raise NotImplementedError('Gym space type ' + str(type(gym_space)) +
-                                ' not implemented yet.')
+      raise NotImplementedError(
+          f'Gym space type {str(type(gym_space))} not implemented yet.')
     return flattened_apply
 
 

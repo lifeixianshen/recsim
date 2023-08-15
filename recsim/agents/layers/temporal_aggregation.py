@@ -132,10 +132,9 @@ class TemporalAggregationLayer(agent.AbstractHierarchicalAgentLayer):
     return all(self._doc_equality_walker([doc1, doc2]))
 
   def _default_slate_comparator(self, slate1, slate2):
-    return all([
+    return all(
         self._doc_comparator(doc1_obs, doc2_obs)
-        for doc1_obs, doc2_obs in zip(slate1, slate2)
-    ])
+        for doc1_obs, doc2_obs in zip(slate1, slate2))
 
   def _spaces_equal(self, gym_space, gym_observations, abs_tolerance=10E-5):
     if isinstance(gym_space, spaces.box.Box):
@@ -156,8 +155,8 @@ class TemporalAggregationLayer(agent.AbstractHierarchicalAgentLayer):
           gym_observations.count(gym_observations[0]) == len(gym_observations),
       ]
     else:
-      raise NotImplementedError('Gym space type ' + str(type(gym_space)) +
-                                ' not implemented yet.')
+      raise NotImplementedError(
+          f'Gym space type {str(type(gym_space))} not implemented yet.')
     return list(all_equal)
 
   def _preprocess_reward_observation(self, reward, observation):

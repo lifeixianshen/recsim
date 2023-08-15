@@ -275,7 +275,7 @@ class LTSResponse(user.AbstractResponse):
     self.engagement = engagement
 
   def __str__(self):
-    return '[' + self.engagement + ']'
+    return f'[{self.engagement}]'
 
   def __repr__(self):
     return self.__str__()
@@ -332,9 +332,10 @@ class LTSDocumentSampler(document.AbstractDocumentSampler):
     self._doc_count = 0
 
   def sample_document(self):
-    doc_features = {}
-    doc_features['doc_id'] = self._doc_count
-    doc_features['clickbait_score'] = self._rng.random_sample()
+    doc_features = {
+        'doc_id': self._doc_count,
+        'clickbait_score': self._rng.random_sample(),
+    }
     self._doc_count += 1
     return self._doc_ctor(**doc_features)
 
